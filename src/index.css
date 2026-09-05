@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#FAF7F2] text-music-ink font-sans min-h-screen antialiased;
+    background-color: #FAF7F2;
+    color: #1C1814;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: 'Playfair Display', Georgia, serif;
+    color: #1C1814;
+  }
+
+  ::selection {
+    background-color: #F3DCB3;
+    color: #1C1814;
+  }
+}
+
+/* Custom scrollbars in light parchment tones */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #F1ECE2;
+}
+::-webkit-scrollbar-thumb {
+  background: #D4CABC;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #BAAE9D;
+}
+
+/* Subtle musical stave motif for light mode */
+.stave-pattern-light {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 18px,
+    rgba(194, 132, 34, 0.08) 19px
+  );
+}
+
+/* Print optimizations for payment receipts & evaluation sheets */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .print-card {
+    border: 1px solid #1C1814 !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+}
