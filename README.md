@@ -1,6 +1,6 @@
-# 🎵 Îlot Musique Alger — Plateforme Académique & Pédagogique
+ Plateforme Académique & Pédagogique
 
-Plateforme web moderne conçue sur mesure pour l'école de musique et conservatoire **Îlot Musique Alger**, permettant la gestion complète des dossiers apprenants, des pièces musicales à apprendre, du pointage des absences (formules 1 ou 2 séances par semaine), des règlements mensuels en Dinars Algériens (DZD), des évaluations des enseignants et d'une riche bibliothèque de partitions et méthodes à télécharger.
+Plateforme web moderne conçue sur mesure pour l'école de musique et conservatoire, permettant la gestion complète des dossiers apprenants, des pièces musicales à apprendre, du pointage des absences (formules 1 ou 2 séances par semaine), des règlements mensuels en Dinars Algériens (DZD), des évaluations des enseignants et d'une riche bibliothèque de partitions et méthodes à télécharger.
 
 ---
 
