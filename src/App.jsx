@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from './context/AppContext';
 import Header from './components/common/Header';
 import LoginView from './components/auth/LoginView';
+import StudentLoginModal from './components/auth/StudentLoginModal';
+import LandingPage from './components/landing/LandingPage';
 import MetronomeModal from './components/common/MetronomeModal';
 import TunerModal from './components/common/TunerModal';
 import ReceiptModal from './components/common/ReceiptModal';
@@ -20,31 +22,151 @@ import {
   CheckCircle,
   AlertTriangle,
   KeyRound,
-  X
+  X,
+  ArrowLeft,
+  Globe
 } from 'lucide-react';
 
 export default function App() {
   const { currentUser, role, hybridMode, toggleHybridMode, toastMessage } = useApp();
+  const [viewMode, setViewMode] = useState('landing'); // 'landing' | 'portal'
   const [currentView, setCurrentView] = useState('main'); // 'main' | 'library'
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isStudentLoginModalOpen, setIsStudentLoginModalOpen] = useState(false);
+
+  // Check URL parameters for direct administration access
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('admin') === '1' || params.get('admin') === 'true') {
+        setViewMode('portal');
+      }
+    }
+  }, []);
 
   // If the logged-in user is a hybrid account, their active workspace depends on hybridMode
   const effectiveRole = currentUser?.role === 'hybrid' ? hybridMode : role;
 
-  // If user is not logged in at all, render the dedicated authentication screen
-  if (!currentUser) {
+  // 1. PUBLIC LANDING PAGE VIEW
+  if (viewMode === 'landing') {
     return (
-      <div className="min-h-screen flex flex-col bg-[#FAF7F2] text-music-ink font-sans">
-        <Header onOpenLogin={() => setIsLoginModalOpen(true)} />
-        <main className="flex-1 flex items-center justify-center p-4">
-          <LoginView />
-        </main>
-        <footer className="bg-white text-music-inkMuted text-xs py-6 border-t border-music-border text-center">
-          Îlot Musique Alger • Conservatoire & École de Musique Privée • Tous droits réservés
-        </footer>
+      <div className="min-h-screen flex flex-col bg-[#FAF7F2] text-music-ink font-sans selection:bg-music-goldLight selection:text-music-ink">
+        <LandingPage 
+          onOpenPortal={() => setViewMode('portal')}
+          onOpenStudentLogin={() => setIsStudentLoginModalOpen(true)}
+          onOpenAdminPortal={() => {
+            if (currentUser?.role === 'admin') {
+              setViewMode('portal');
+            } else {
+              setIsLoginModalOpen(true);
+            }
+          }}
+        />
+
+        {/* Dedicated Student Login Modal */}
+        <StudentLoginModal
+          isOpen={isStudentLoginModalOpen}
+          onClose={() => setIsStudentLoginModalOpen(false)}
+          onSuccess={() => {
+            setIsStudentLoginModalOpen(false);
+            setViewMode('portal');
+            setCurrentView('main');
+          }}
+          onOpenAdminPortal={() => {
+            setIsStudentLoginModalOpen(false);
+            if (currentUser?.role === 'admin') {
+              setViewMode('portal');
+            } else {
+              setIsLoginModalOpen(true);
+            }
+          }}
+        />
+
+        {/* Administration / Teacher Login Modal */}
+        {isLoginModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs select-none animate-fadeIn">
+            <div className="relative w-full max-w-xl">
+              <button
+                onClick={() => setIsLoginModalOpen(false)}
+                className="absolute top-4 right-4 z-50 p-2 rounded-xl bg-white hover:bg-music-card text-music-inkLight hover:text-music-ink shadow-sm border border-music-border"
+                aria-label="Fermer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <LoginView onSuccess={() => {
+                setIsLoginModalOpen(false);
+                setViewMode('portal');
+              }} />
+            </div>
+          </div>
+        )}
+
+
+
+        {/* Global modals */}
         <MetronomeModal />
         <TunerModal />
         <SettingsModal />
+
+        {toastMessage && (
+          <div className="fixed bottom-6 right-6 z-50 flex items-center space-x-2.5 px-4 py-3 rounded-2xl bg-white text-music-ink shadow-card border border-music-border text-xs font-bold animate-bounce-short">
+            {toastMessage.type === 'error' ? (
+              <AlertTriangle className="w-4 h-4 text-rose-600" />
+            ) : (
+              <CheckCircle className="w-4 h-4 text-emerald-600" />
+            )}
+            <span>{toastMessage.message}</span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // 2. PORTAL VIEW (LOGIN REQUIRED IF NOT LOGGED IN)
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen flex flex-col bg-[#FAF7F2] text-music-ink font-sans">
+        {/* Portal top bar with back to landing page */}
+        <div className="bg-[#1C1814] text-white px-4 py-2.5 flex items-center justify-between text-xs border-b border-music-border">
+          <button
+            onClick={() => setViewMode('landing')}
+            className="flex items-center space-x-1.5 text-music-gold hover:text-white font-bold transition"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>← Retour au Site & Présentation (Landing Page)</span>
+          </button>
+
+          <div className="text-white/70 hidden sm:block">
+            Îlot Musique Alger • American Canadian Academy
+          </div>
+        </div>
+
+        <Header onOpenLogin={() => setIsLoginModalOpen(true)} />
+        
+        <main className="flex-1 flex flex-col items-center justify-center p-4">
+          <div className="mb-4 text-center">
+            <span className="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200 text-xs font-bold mb-2">
+              Espace Restreint
+            </span>
+            <h2 className="font-display font-bold text-2xl text-music-ink">
+              Connexion au Portail Académique
+            </h2>
+            <p className="text-xs text-music-inkMuted mt-1">
+              Administration, Professeurs certifiés ACA et Étudiants
+            </p>
+          </div>
+
+          <LoginView />
+        </main>
+
+        <footer className="bg-white text-music-inkMuted text-xs py-6 border-t border-music-border text-center">
+          Îlot Musique Alger • Conservatoire & École de Musique Privée • Tous droits réservés
+        </footer>
+
+        <MetronomeModal />
+        <TunerModal />
+        <SettingsModal />
+
         {toastMessage && (
           <div className="fixed bottom-6 right-6 z-50 flex items-center space-x-2.5 px-4 py-3 rounded-2xl bg-white text-music-ink shadow-card border border-music-border text-xs font-bold">
             {toastMessage.type === 'error' ? (
@@ -59,6 +181,7 @@ export default function App() {
     );
   }
 
+  // 3. LOGGED-IN PORTAL DASHBOARD
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF7F2] text-music-ink font-sans selection:bg-music-goldLight selection:text-music-ink">
       
@@ -122,8 +245,17 @@ export default function App() {
             </div>
           </div>
 
-          {/* View Switcher */}
+          {/* View Switcher & Landing Back Button */}
           <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setViewMode('landing')}
+              className="flex items-center space-x-1 px-3 py-1.5 rounded-xl font-bold transition text-xs border border-music-border bg-amber-50/60 text-amber-950 hover:bg-amber-100"
+              title="Retourner à la page de présentation publique"
+            >
+              <Globe className="w-3.5 h-3.5 text-music-gold" />
+              <span>Site & Présentation</span>
+            </button>
+
             <button
               onClick={() => setCurrentView('main')}
               className={`px-3.5 py-1.5 rounded-xl font-bold transition text-xs ${
@@ -176,7 +308,7 @@ export default function App() {
               className="w-8 h-8 rounded-lg object-cover border border-music-border shadow-2xs"
             />
             <span className="font-display font-bold text-base tracking-tight text-music-ink">Îlot Musique Alger</span>
-            <span className="text-music-inkLight text-xs">— École & Conservatoire de Musique</span>
+            <span className="text-music-inkLight text-xs">— Représentant American Canadian Academy</span>
           </div>
 
           <div className="text-center md:text-right text-music-inkMuted space-y-1">

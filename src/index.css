@@ -64,3 +64,25 @@
     break-inside: avoid;
   }
 }
+
+/* Continuous Infinite Marquee for Disciplines */
+@keyframes marquee-disciplines {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-disciplines {
+  display: flex;
+  width: max-content;
+  animation: marquee-disciplines 22s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-disciplines:hover,
+.animate-marquee-disciplines:focus-within {
+  animation-play-state: paused;
+}

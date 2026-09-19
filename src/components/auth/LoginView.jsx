@@ -76,7 +76,7 @@ export default function LoginView({ onSuccess }) {
                   : 'text-music-inkMuted hover:text-music-ink'
               }`}
             >
-              🇫🇷 FR
+              FR
             </button>
             <button
               type="button"
@@ -87,7 +87,7 @@ export default function LoginView({ onSuccess }) {
                   : 'text-music-inkMuted hover:text-music-ink'
               }`}
             >
-              🇩🇿 العربية
+              العربية
             </button>
             <button
               type="button"
@@ -98,7 +98,7 @@ export default function LoginView({ onSuccess }) {
                   : 'text-music-inkMuted hover:text-music-ink'
               }`}
             >
-              🇬🇧 EN
+              EN
             </button>
           </div>
         </div>
